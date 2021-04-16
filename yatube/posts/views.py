@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 
 from .models import Group, Post
+from .forms import CreationPost
 
 
 def index(request):
@@ -17,3 +18,15 @@ def group_posts(request, slug):
 def group_index(request):
     groups = Group.objects.all()
     return render(request, 'group_index.html', {'groups': groups})
+
+
+def new_post(request):
+    """Create new post for blog.
+    
+    args:
+    returns:
+    """
+    form = CreationPost()
+    # Create new post.
+    return render(request, 'new.html', {'form': form})
+    
