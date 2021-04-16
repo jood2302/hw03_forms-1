@@ -1,4 +1,5 @@
 yatube/sent_emails/
+manage.py
 
 yatube/static/
 yatube/posts/static/
