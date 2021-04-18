@@ -3,6 +3,8 @@ manage.py
 
 yatube/static/
 yatube/posts/static/
+.vscode/
+.vscode
 
 
 # Byte-compiled / optimized / DLL files
