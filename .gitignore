@@ -1,8 +1,9 @@
 yatube/sent_emails/
 
-
 yatube/static/
 yatube/posts/static/
+.vscode/
+.vscode
 
 
 # Byte-compiled / optimized / DLL files
