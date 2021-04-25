@@ -19,7 +19,7 @@ def group_posts(request, slug):
 
 def group_index(request):
     groups = Group.objects.all()
-    return render(request, 'group_index.html', {'groups': groups})
+    return render(request, 'posts/group_index.html', {'groups': groups})
 
 
 def new_post(request):
@@ -33,8 +33,8 @@ def new_post(request):
             new_Post.group = form.cleaned_data['group']
             new_Post.pub_date = dt.date.today()
             new_Post.save_base()
-            return redirect('/')
-        return render(request, 'new.html', {'form': form})
+            return redirect('index')
+        return render(request, 'posts/new_post.html', {'form': form})
 
     form = PostForm()
-    return render(request, 'new.html', {'form': form})
+    return render(request, 'posts/new_post.html', {'form': form})

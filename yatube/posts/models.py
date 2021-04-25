@@ -5,32 +5,48 @@ User = get_user_model()
 
 
 class Group(models.Model):
-    title = models.CharField(max_length=200, unique=True,
-                             help_text="Title of group.")
-    slug = models.SlugField(unique=True,
-                            help_text="Short name of Group for URL.")
-    description = models.TextField()
+    title = models.CharField(
+        max_length=200, unique=True, 
+        help_text='Название сборника.',
+        verbose_name='Название сборника'
+    )
+    slug = models.SlugField(
+        unique=True, 
+        help_text='Часть адресной строки для сборника',
+        verbose_name='SLUG'
+    )
+    description = models.TextField(
+        verbose_name='Описание сборника'
+    )
 
     class Meta:
-        verbose_name = 'Group of posts'
-        verbose_name_plural = 'Groups of posts'
+        verbose_name = 'Сборник записей'
+        verbose_name_plural = 'Сборники записей'
 
     def __str__(self):
         return self.title
 
 
 class Post(models.Model):
-    text = models.TextField()
-    pub_date = models.DateTimeField('date published', auto_now_add=True)
+    text = models.TextField(
+        verbose_name='Текст'
+    )
+    pub_date = models.DateTimeField(
+        'Дата публикации', auto_now_add=True
+    )
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,
-        related_name='posts')
+        related_name='posts', verbose_name='Автор'
+    )
     group = models.ForeignKey(
         Group, on_delete=models.SET_NULL, blank=True, null=True,
-        related_name='posts')
+        related_name='posts', verbose_name='Сборник записей'
+    )
 
     def __str__(self):
         return self.text
 
     class Meta:
         ordering = ('-pub_date',)
+        verbose_name = 'Запись'
+        verbose_name_plural = 'Записи'

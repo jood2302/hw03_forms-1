@@ -5,7 +5,7 @@
   
   {% if user.is_authenticated %}
 
-    <form method="post" action="{% url 'new' %}">
+    <form method="post" action="{% url 'new_post' %}">
       {% csrf_token %}
 
       {% for field in form %}

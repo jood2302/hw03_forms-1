@@ -6,5 +6,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('group/', views.group_index, name='group_index'),
     path('group/<slug:slug>/', views.group_posts, name='group'),
-    path('new/', views.new_post, name='new'),
+    path('new_post/', views.new_post, name='new_post'),
 ]

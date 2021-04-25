@@ -28,7 +28,7 @@ ALLOWED_HOSTS: List[str] = [
 
 INSTALLED_APPS = [
     'users',
-    'posts',
+    'posts.apps.PostsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -61,7 +61,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'context_processors.current_year',
+                'yatube.context_processors.current_year',
             ],
         },
     },
