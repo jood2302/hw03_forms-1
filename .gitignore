@@ -5,6 +5,9 @@ yatube/posts/static/
 .vscode/
 .vscode
 
+.ve.cmd
+ve.cmd
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

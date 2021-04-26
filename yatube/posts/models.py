@@ -7,21 +7,21 @@ User = get_user_model()
 class Group(models.Model):
     title = models.CharField(
         max_length=200, unique=True, 
-        help_text='Название сборника.',
-        verbose_name='Название сборника'
+        help_text='Название подборки',
+        verbose_name='Название подборки'
     )
     slug = models.SlugField(
         unique=True, 
-        help_text='Часть адресной строки для сборника',
+        help_text='Часть адресной строки для подборки',
         verbose_name='SLUG'
     )
     description = models.TextField(
-        verbose_name='Описание сборника'
+        verbose_name='Описание подборки'
     )
 
     class Meta:
-        verbose_name = 'Сборник записей'
-        verbose_name_plural = 'Сборники записей'
+        verbose_name = 'Подборка записей'
+        verbose_name_plural = 'Подборки записей'
 
     def __str__(self):
         return self.title
@@ -40,11 +40,11 @@ class Post(models.Model):
     )
     group = models.ForeignKey(
         Group, on_delete=models.SET_NULL, blank=True, null=True,
-        related_name='posts', verbose_name='Сборник записей'
+        related_name='posts', verbose_name='Подборка записей'
     )
 
     def __str__(self):
-        return self.text
+        return self.text[:15]
 
     class Meta:
         ordering = ('-pub_date',)
