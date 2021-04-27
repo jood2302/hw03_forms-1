@@ -19,12 +19,12 @@ class Group(models.Model):
         verbose_name='Описание подборки'
     )
 
+    def __str__(self):
+        return self.title
+
     class Meta:
         verbose_name = 'Подборка записей'
         verbose_name_plural = 'Подборки записей'
-
-    def __str__(self):
-        return self.title
 
 
 class Post(models.Model):
@@ -43,10 +43,10 @@ class Post(models.Model):
         related_name='posts', verbose_name='Подборка записей'
     )
 
-    def __str__(self):
-        return self.text[:15]
-
     class Meta:
         ordering = ('-pub_date',)
         verbose_name = 'Запись'
         verbose_name_plural = 'Записи'
+
+    def __str__(self):
+        return self.text[:15]

@@ -9,7 +9,7 @@
           <div class="card-header">Зарегистрироваться</div>
           <div class="card-body">
 
-            {% for error in form.errors %}
+            {% for error in form.errors.values %}
               <div class="alert alert-danger" role="alert">
                 {{ error }}
               </div>

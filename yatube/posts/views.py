@@ -1,9 +1,9 @@
 import datetime as dt
 
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import Group, Post
 from .forms import PostForm
+from .models import Group, Post
 
 
 def index(request):
@@ -24,17 +24,19 @@ def group_index(request):
 
 def new_post(request):
     """Create new post for blog."""
+    
+    form = PostForm(request.POST or None)
+    # initialise PostForm() with 'None' if request.POST absent
+        
     if request.method == 'POST':
-        form = PostForm(request.POST)
+
         if form.is_valid():
             new_Post = Post()
             new_Post.text = form.cleaned_data['text']
             new_Post.author = request.user
             new_Post.group = form.cleaned_data['group']
-            new_Post.pub_date = dt.date.today()
             new_Post.save_base()
             return redirect('index')
-        return render(request, 'posts/new_post.html', {'form': form})
 
-    form = PostForm()
     return render(request, 'posts/new_post.html', {'form': form})
+
