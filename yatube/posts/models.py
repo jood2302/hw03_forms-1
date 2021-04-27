@@ -6,12 +6,12 @@ User = get_user_model()
 
 class Group(models.Model):
     title = models.CharField(
-        max_length=200, unique=True, 
+        max_length=200, unique=True,
         help_text='Название подборки',
         verbose_name='Название подборки'
     )
     slug = models.SlugField(
-        unique=True, 
+        unique=True,
         help_text='Часть адресной строки для подборки',
         verbose_name='SLUG'
     )
@@ -19,20 +19,21 @@ class Group(models.Model):
         verbose_name='Описание подборки'
     )
 
-    def __str__(self):
-        return self.title
-
     class Meta:
         verbose_name = 'Подборка записей'
         verbose_name_plural = 'Подборки записей'
 
+    def __str__(self):
+        return self.title
+
 
 class Post(models.Model):
     text = models.TextField(
-        verbose_name='Текст'
+        verbose_name='Текст записи'
     )
     pub_date = models.DateTimeField(
-        'Дата публикации', auto_now_add=True
+        verbose_name='Дата публикации',
+        auto_now_add=True
     )
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,

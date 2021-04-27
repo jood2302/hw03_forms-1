@@ -1,5 +1,4 @@
-import datetime as dt
-
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import PostForm
@@ -22,12 +21,13 @@ def group_index(request):
     return render(request, 'posts/group_index.html', {'groups': groups})
 
 
+@login_required
 def new_post(request):
     """Create new post for blog."""
-    
+
     form = PostForm(request.POST or None)
     # initialise PostForm() with 'None' if request.POST absent
-        
+
     if request.method == 'POST':
 
         if form.is_valid():
@@ -39,4 +39,3 @@ def new_post(request):
             return redirect('index')
 
     return render(request, 'posts/new_post.html', {'form': form})
-
