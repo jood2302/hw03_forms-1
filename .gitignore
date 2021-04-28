@@ -155,3 +155,4 @@ dmypy.json
 .history/
 
 .mypy_cache
+yatube/db.sqlite3.back
