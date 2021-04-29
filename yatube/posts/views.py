@@ -34,12 +34,6 @@ def new_post(request):
             new_Post = form.save(commit=False)
             new_Post.author = request.user
             new_Post.save()
-
-            # new_Post = Post()
-            # new_Post.text = form.cleaned_data['text']
-            # new_Post.author = request.user
-            # new_Post.group = form.cleaned_data['group']
-            # new_Post.save_base()
             return redirect('index')
 
     return render(request, 'posts/new_post.html', {'form': form})
