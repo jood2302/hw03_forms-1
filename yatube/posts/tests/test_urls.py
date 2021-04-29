@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 
 
 class StaticURLTests(TestCase):
@@ -10,5 +10,5 @@ class StaticURLTests(TestCase):
     def test_homepage(self):
         # Отправляем запрос через client,
         # созданный в setUp()
-        response = self.guest_client.get('/')
+        response = self.guest_client.get('/')  
         self.assertEqual(response.status_code, 200)
