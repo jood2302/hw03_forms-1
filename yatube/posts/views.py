@@ -8,15 +8,15 @@ from .models import Group, Post
 
 def index(request):
     post_list = Post.objects.all()
-    paginator = Paginator(post_list, 10) 
+    paginator = Paginator(post_list, 10)
 
-    page_number = request.GET.get('page') 
-    page = paginator.get_page(page_number) 
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
     return render(
-         request,
-         'index.html',
-         {'page': page},
-     ) 
+        request,
+        'index.html',
+        {'page': page},
+    )
 
 
 def group_posts(request, slug):
@@ -32,17 +32,15 @@ def group_index(request):
 
 @login_required
 def new_post(request):
-    """Create new post for blog."""
+    """For post obj create form, render and check it, then save model obj."""
 
-    form = PostForm(request.POST or None)
     # initialise PostForm() with 'None' if request.POST absent
+    form = PostForm(request.POST or None)
 
-    if request.method == 'POST':
-
-        if form.is_valid():
-            new_Post = form.save(commit=False)
-            new_Post.author = request.user
-            new_Post.save()
-            return redirect('index')
+    if form.is_valid():
+        new_post = form.save(commit=False)
+        new_post.author = request.user
+        new_post.save()
+        return redirect('index')
 
     return render(request, 'posts/new_post.html', {'form': form})

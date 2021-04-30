@@ -4,11 +4,7 @@
 {% block content %}
   
   {% if user.is_authenticated %}
-    {% for error in form.errors.values %}
-      <div class="alert alert-danger" role="alert">
-        {{ error }}
-      </div>
-    {% endfor %}
+    {% include "posts/form_error_ handling.html" %}
     
     <form method="post" action="{% url 'new_post' %}">
       {% csrf_token %}
@@ -41,9 +37,9 @@
       </div>
     </form>
   {% else %}
-  <div class="alert alert-info" role="alert">
-    Вы обратились к странице, доступ к которой возможен только для залогиненных пользователей.<br>
-    Пожалуйста, авторизуйтесь.
-  </div>
+    <div class="alert alert-info" role="alert">
+      Вы обратились к странице, доступ к которой возможен только для залогиненных пользователей.<br>
+      Пожалуйста, авторизуйтесь.
+    </div>
   {% endif %}
 {% endblock %} 

@@ -7,7 +7,9 @@ User = get_user_model()
 class Group(models.Model):
     title = models.CharField(
         max_length=200, unique=True,
-        help_text='Название подборки',
+        help_text=('Группа, сообщество, подборка записей, суть одна, в этом '
+                   'месте собраны сообщения, имеющие некую общность. '
+                   'Название подборки призвано её отражать'),
         verbose_name='Название подборки'
     )
     slug = models.SlugField(
