@@ -88,7 +88,9 @@ def post_edit(request, username, post_id):
                 return redirect('index')
         return render(
             request, 'posts/new_post.html',
-            {'form': form, 'post': post, 'edit_flag': True}
+            {'form': form, 'post': post,
+             'edit_flag': True, 'username': username,
+             'author': post.author}
         )
     return redirect('index')
 
