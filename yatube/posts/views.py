@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
@@ -51,6 +50,7 @@ def new_post(request):
 
     return render(request, 'posts/new_post.html', {'form': form})
 
+
 def profile(request, username):
     profile_user = User.objects.get(username=username)
 
@@ -64,9 +64,11 @@ def profile(request, username):
                   {'profile_user': profile_user,
                    'page': page, 'post_count': post_count})
 
+
 def post_view(request, username, post_id):
     post = Post.objects.get(id=post_id)
-    return render(request, 'posts/post.html', { 'post': post }) 
+    return render(request, 'posts/post.html', {'post': post})
+
 
 @login_required
 def post_edit(request, username, post_id):
@@ -74,16 +76,18 @@ def post_edit(request, username, post_id):
         post = Post.objects.get(id=post_id)
         if request.method != 'POST':
             form = PostForm(instance=post)
-            
         else:
             form = PostForm(instance=post, data=request.POST)
 
             if form.is_valid():
                 post.save()
                 return redirect('index')
-        return render(request, 'posts/new_post.html', {'form': form, 'post': post, 'edit_flag': True})
-    
+        return render(
+            request, 'posts/new_post.html',
+            {'form': form, 'post': post, 'edit_flag': True}
+        )
+
 
 def add_comment(request, username, post_id):
     post = Post.objects.get(id=post_id)
-    return render(request, 'posts/post.html', { 'post': post})
+    return render(request, 'posts/post.html', {'post': post})
