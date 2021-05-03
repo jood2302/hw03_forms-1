@@ -1,17 +1,29 @@
 {% extends "base.html" %}
 {% block title %}Последние обновления на сайте{% endblock %}
-{% block header %}Последние обновления на сайте{% endblock %}
 {% block content %}
-  {% for post in page %}
-    <h3>
-      Автор: {{ post.author.get_full_name }}, Дата публикации: {{ post.pub_date|date:"d M Y" }}
-    </h3>
-    <p>{{ post.text|linebreaksbr }}</p>
-    {% if not forloop.last %}
-      <hr>
-    {% endif %}
-  {% endfor %}
+  <div class="row justify-content-center">
+    <div class="col-md-12 p-5">
+      <div class="card">
+      <div class="card-header">Последние обновления на сайте</div>
+        <div class="card-body">
 
-  {% include "posts/paginator.html" %}
-
+          {% for post in page %}
+            <div>
+              <h3>
+                Автор:
+                <a href="{% url 'profile' post.author.username %}">
+                  {{ post.author.get_full_name }}</a>, Дата публикации: {{ post.pub_date|date:"d M Y" }}
+                  {% if post.group != None %}, в подборке <a href="{% url 'group' slug=post.group.slug %}">{{ post.group.title }}</a>{% endif %}
+              </h3>
+            </div>
+            <p>{{ post.text|linebreaksbr }}</p>
+            {% if not forloop.last %}
+            <hr>
+            {% endif %}
+          {% endfor %}
+          {% include "posts/paginator.html" %}
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %} 

@@ -27,6 +27,7 @@ ALLOWED_HOSTS: List[str] = [
 ]
 
 INSTALLED_APPS = [
+    'about',
     'users',
     'posts.apps.PostsConfig',
     'django.contrib.admin',

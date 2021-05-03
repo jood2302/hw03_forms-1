@@ -1,17 +1,29 @@
 {% extends "base.html" %}
-{% block title %}Новая запись{% endblock %}
-{% block header %}Новая запись{% endblock %}
+{% block title %}
+  {% if edit_flag %}Редактировать запись
+  {% else %}Новая запись
+  {% endif %}
+{% endblock %}
+{% block header %}
+  {% if edit_flag %}Редактировать запись
+  {% else %}Новая запись
+  {% endif %}
+{% endblock %}
 {% block content %}
   
   {% if user.is_authenticated %}
-    {% include "posts/form_error_ handling.html" %}
+    {% include "posts/form_error_handling.html" %}
     
-    <form method="post" action="{% url 'new_post' %}">
+    {% if edit_flag %}
+      <form method="post" action="{% url 'post_edit' username=post.author post_id=post.id %}">
+    {% else %}
+      <form method="post" action="{% url 'new_post' %}">
+    {% endif %}
       {% csrf_token %}
 
       {% for field in form %}
         <div class="form-group row" 
-          aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
+          aria-required={{ field.field.required }}>
           <label for="{{ field.id_for_label }}" class="col-md-4 col-form-label text-md-right">
             {{ field.label }}
             {% if field.field.required %}
@@ -32,7 +44,11 @@
       <div class="col-md-6 offset-md-4">
         <br>
         <button type="submit" class="btn btn-primary">
-          Создать новую запись
+          {% if edit_flag %}
+            Сохранить запись
+          {% else %}
+            Создать новую запись
+          {% endif %}
         </button>
       </div>
     </form>
