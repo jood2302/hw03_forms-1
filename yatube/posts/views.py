@@ -69,7 +69,8 @@ def post_view(request, username, post_id):
     post = Post.objects.get(id=post_id)
     return render(
         request, 'posts/post.html',
-        {'post': post, 'username': username, 'post_id': post_id}
+        {'post': post, 'username': username,
+         'author': post.author, 'post_id': post_id}
     )
 
 
