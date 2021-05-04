@@ -86,14 +86,14 @@ def post_edit(request, username, post_id):
 
             if form.is_valid():
                 post.save()
-                return redirect('index')
+                return redirect('post', username=username, post_id=post_id)
         return render(
             request, 'posts/new_post.html',
             {'form': form, 'post': post,
              'edit_flag': True, 'username': username,
              'author': post.author, 'post_id': post_id}
         )
-    return redirect('post', username, post_id)
+    return redirect('post', username=username, post_id=post_id)
 
 
 def add_comment(request, username, post_id):

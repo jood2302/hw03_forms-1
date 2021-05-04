@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}
-  Запись пользователя {{ post.author }} от 
+  Запись пользователя {{ post.author.get_full_name }} от 
   {{ post.pub_date|date:"d M Y" }}
 {% endblock %}
 {% block header %}
