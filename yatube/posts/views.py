@@ -90,7 +90,7 @@ def post_edit(request, username, post_id):
             request, 'posts/new_post.html',
             {'form': form, 'post': post,
              'edit_flag': True, 'username': username,
-             'author': post.author}
+             'author': post.author, 'post_id': post_id}
         )
     return redirect('index')
 
