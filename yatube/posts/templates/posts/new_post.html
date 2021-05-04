@@ -15,7 +15,7 @@
     {% include "posts/form_error_handling.html" %}
     
     {% if edit_flag %}
-      <form method="post" action="{% url 'post_edit' username=post.author post_id=post.id %}">
+      <form method="post" action="{% url 'post_edit' username=post.author.username post_id=post.id %}">
     {% else %}
       <form method="post" action="{% url 'new_post' %}">
     {% endif %}
