@@ -52,7 +52,7 @@ def new_post(request):
 
 
 def profile(request, username):
-    profile_user = User.objects.get(username=username)
+    profile_user = get_object_or_404(User, username=username)
 
     user_posts = profile_user.posts.all()
     post_count = user_posts.count()
@@ -66,7 +66,7 @@ def profile(request, username):
 
 
 def post_view(request, username, post_id):
-    post = Post.objects.get(id=post_id)
+    post = get_object_or_404(Post, id=post_id)
     return render(
         request, 'posts/post.html',
         {'post': post, 'username': username,
@@ -76,8 +76,9 @@ def post_view(request, username, post_id):
 
 @login_required
 def post_edit(request, username, post_id):
-    post = Post.objects.get(id=post_id)
-    if request.user == username:
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.user.username == username:
         if request.method != 'POST':
             form = PostForm(instance=post)
         else:
@@ -96,5 +97,5 @@ def post_edit(request, username, post_id):
 
 
 def add_comment(request, username, post_id):
-    post = Post.objects.get(id=post_id)
+    post = get_object_or_404(Post, id=post_id)
     return render(request, 'posts/post.html', {'post': post})
