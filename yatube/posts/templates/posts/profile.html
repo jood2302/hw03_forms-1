@@ -46,7 +46,7 @@
                     Добавить комментарий
                   </a>
                   {% if user.is_authenticated and user.username == profile_user.username %}                  
-                    <a class="btn btn-sm text-muted" href="{% url 'post' username=profile_user.username post_id=post.id %}" role="button">
+                    <a class="btn btn-sm text-muted" href="{% url 'post_edit' username=profile_user.username post_id=post.id %}" role="button">
                       Редактировать
                     </a>
                   {% endif %}
