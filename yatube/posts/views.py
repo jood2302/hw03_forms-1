@@ -92,7 +92,7 @@ def post_edit(request, username, post_id):
              'edit_flag': True, 'username': username,
              'author': post.author, 'post_id': post_id}
         )
-    return redirect('index')
+    return redirect('post', username, post_id)
 
 
 def add_comment(request, username, post_id):
