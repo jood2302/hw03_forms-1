@@ -2,6 +2,7 @@
 {% block title %}Профиль пользователя {{ profile_user.username }}{% endblock %}
 {% block header %}Профиль пользователя {{ profile_user.username }}{% endblock %}
 {% block content %}
+  {% load user_filters %}
   <main role="main" class="container">
     <div class="row">
       <div class="col-md-3 mb-3 mt-1">
@@ -23,7 +24,7 @@
             </li>
             <li class="list-group-item">
               <div class="h6 text-muted">
-                Записей: {{ post_count }}
+                Записей: {{ profile_user.posts.count() }}
               </div>
             </li>
           </ul>
@@ -43,22 +44,18 @@
               <div class="d-flex justify-content-between align-items-center">
                 <div class="btn-group ">
                   
-                  {% if user.is_authenticated and user.username == profile_user.username %}                  
+                  {% if user.username == profile_user.username %}                  
                     <a class="btn btn-sm text-muted" href="{% url 'post_edit' username=profile_user.username post_id=post.id %}" role="button">
-                      Редактировать
-                    </a>
-                  {% else %}
-                    <a class="btn btn-sm text-muted" href="{% url 'post' username=profile_user.username post_id=post.id %}" role="button">
                       Редактировать
                     </a>
                   {% endif %}
                 </div>
-                  <small class="text-muted">31 июля 1854 г. 0:00</small>
+                <small class="text-muted">{{ {{ post.pub_date|date:"d M Y" }} }}</small>
               </div>
             </div>
           </div>
         {% endfor %}
-        {% include "posts/paginator.html" %}
+        {% include "posts/includes/paginator.html" %}
       </div>
     </div>
   </main> 
