@@ -1,30 +1,30 @@
-import sys, os, unittest
 from django.test import TestCase, Client
 
-sys.path.append(os.path.abspath('../../posts'))
-from .models import Group, Post
+from posts.models import Group, Post
 
 
-class ModelsTests(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        print("setUpTestData: Run once to set up non-modified data for all class methods.")
-        test_group = Group
-        test_group.title = 'test group name'
-        test_post = Post
-        test_post.text = 'test text for test post'
-
+class StrModelTests(TestCase):
 
     def setUp(self):
-        print("setUp: Run once for every test method to setup clean data.")
-        pass
-        
+        # Устанавливаем данные для тестирования
+        # Создаём экземпляр клиента. Он неавторизован.
+        self.guest_client = Client()
 
-    def test_return_str_group(self):
-        
-        self.assertEqual(test_group.str, 'test group name')
+        self.test_group = Group()
+        self.test_group.title = 'first_test_group'
+        self.test_group.slug = 'first_test_group'
 
-    def test_return_str_post(self):
-        
-        self.assertEqual(test_post.str, 'test text for t')
+        self.test_post = Post()
+        self.test_post.text = 'test post text for test __str__'
 
+    def test_smoke(self):
+        # Отправляем запрос через client,
+        # созданный в setUp()
+        response = self.guest_client.get('/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_group_str(self):
+        self.assertEqual(f'{self.test_group}', 'first_test_group')
+
+    def test_post_str(self):
+        self.assertEqual(f'{self.test_post}', 'test post text ')
