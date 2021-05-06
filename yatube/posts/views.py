@@ -81,7 +81,7 @@ def post_view(request, username, post_id):
     if post.author.username == username:
         return render(
             request, 'posts/post.html',
-            {'post': post, 'username': username, }
+            {'post': post, 'post.author': post.author, }
         )
     return redirect('post', username=post.author.username, post_id=post_id)
 
