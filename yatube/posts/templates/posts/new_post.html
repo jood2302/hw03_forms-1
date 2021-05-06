@@ -2,23 +2,24 @@
 {% block title %}
   {% if edit_flag %}Редактировать запись{% else %}Новая запись{% endif %}
 {% endblock %}
-{% block header %}
-  {% if edit_flag %}Редактировать запись{% else %}Новая запись{% endif %}
-{% endblock %}
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-md-12 p-5">
       <div class="card">
+        <div class="card-header text-md-center">
+          {% if edit_flag %}Редактировать запись{% else %}Новая запись{% endif %}
+        </div>
         <div class="card-body">
   
           {% include "posts/includes/form_error_handling.html" %}  
           
-          <form  method="post" 
+          <form  method="post" action="
             {% if edit_flag %}
-              action="{% url 'post_edit' username=post.author.username post_id=post.id %}">
+              {% url 'post_edit' username=post.author.username post_id=post.id %}
             {% else %}
-              action="{% url 'new_post' %}">
+              {% url 'new_post' %}
             {% endif %}
+            ">
 
             {% csrf_token %}
 

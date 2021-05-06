@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block title %}Профиль пользователя {{ profile_user.username }}{% endblock %}
-{% block header %}Профиль пользователя {{ profile_user.username }}{% endblock %}
 {% block content %}
   {% load user_filters %}
   <main role="main" class="container">
@@ -24,7 +23,7 @@
             </li>
             <li class="list-group-item">
               <div class="h6 text-muted">
-                Записей: {{ profile_user.posts.count() }}
+                Записей: {{ profile_user.posts.count }}
               </div>
             </li>
           </ul>
@@ -50,7 +49,7 @@
                     </a>
                   {% endif %}
                 </div>
-                <small class="text-muted">{{ {{ post.pub_date|date:"d M Y" }} }}</small>
+                <small class="text-muted">{{ post.pub_date|date:"d M Y" }}</small>
               </div>
             </div>
           </div>

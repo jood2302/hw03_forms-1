@@ -4,7 +4,7 @@
   <div class="row justify-content-center">
     <div class="col-md-12 p-5">
       <div class="card">
-      <div class="card-header">Последние обновления на сайте</div>
+      <div class="card-header text-md-center">Последние обновления на сайте</div>
         <div class="card-body">
 
           {% for post in page %}
@@ -21,7 +21,7 @@
               <hr>
             {% endif %}
           {% endfor %}
-          {% include "posts/paginator.html" %}
+          {% include "posts/includes/paginator.html" %}
         </div>
       </div>
     </div>

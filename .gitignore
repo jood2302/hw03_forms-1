@@ -157,3 +157,4 @@ dmypy.json
 .mypy_cache
 yatube/db.sqlite3.back
 yatube/posts/templates/posts/Untitled-1.txt
+yatube/posts/templates/posts/post1.html

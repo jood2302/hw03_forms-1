@@ -7,9 +7,10 @@ from .models import Group, Post, User
 
 PAGINATOR_COUNT_PER_PAGE: int = 10
 
+
 def pagination(request, objects, num_per_page):
     """Рутина подготовки Пагинатора для страниц.
-    
+
     аргументы:
     request - HttpRequest от запрошенной страницы, содержит номер страницы,
               для которой нужно вывести порцию объектов
@@ -22,6 +23,7 @@ def pagination(request, objects, num_per_page):
     page = paginator.get_page(page_number)
     return page
 
+
 def index(request):
     post_list = Post.objects.all()
     page = pagination(request, post_list, PAGINATOR_COUNT_PER_PAGE)
@@ -31,9 +33,10 @@ def index(request):
         {'page': page},
     )
 
+
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = group.posts.all()    
+    posts = group.posts.all()
     page = pagination(request, posts, PAGINATOR_COUNT_PER_PAGE)
 
     return render(request, 'posts/group.html', {'group': group, 'page': page})
@@ -66,7 +69,7 @@ def profile(request, username):
     profile_user = get_object_or_404(User, username=username)
 
     user_posts = profile_user.posts.all()
-    page = pagination(request, objeuser_postscts, PAGINATOR_COUNT_PER_PAGE)
+    page = pagination(request, user_posts, PAGINATOR_COUNT_PER_PAGE)
 
     return render(request, 'posts/profile.html',
                   {'profile_user': profile_user,
@@ -75,29 +78,25 @@ def profile(request, username):
 
 def post_view(request, username, post_id):
     post = get_object_or_404(Post, id=post_id)
-    return render(
-        request, 'posts/post.html',
-        {'post': post, 'username': username,
-         'author': post.author, 'post_id': post_id}
-    )
+    if post.author.username == username:
+        return render(
+            request, 'posts/post.html',
+            {'post': post, }
+        )
+    return redirect('post', username=post.author.username, post_id=post_id)
+
 
 @login_required
 def post_edit(request, username, post_id):
     post = get_object_or_404(Post, id=post_id)
+    if post.author.username == username:
+        form = PostForm(request.POST or None, instance=post)
+        if form.is_valid():
+            post.save()
+            return redirect('post', username=post.author.username,
+                            post_id=post_id)
 
-    if request.user.username == post.author.username:
-        if request.method != 'POST':
-            form = PostForm(instance=post)
-        else:
-            form = PostForm(instance=post, data=request.POST)
+        return render(request, 'posts/new_post.html',
+                      {'form': form, 'post': post, 'edit_flag': True, })
 
-            if form.is_valid():
-                post.save()
-                return redirect('post', username=username, post_id=post_id)
-        return render(
-            request, 'posts/new_post.html',
-            {'form': form, 'post': post,
-             'edit_flag': True, 'username': username,
-             'author': post.author, 'post_id': post_id}
-        )
-    return redirect('post', username=username, post_id=post_id)
+    return redirect('post', username=post.author.username, post_id=post_id)

@@ -5,7 +5,7 @@
   <div class="row justify-content-center">
     <div class="col-md-12 p-5">
       <div class="card">
-        <div class="card-header">{{ group.description }}</div>
+        <div class="card-header text-md-right">{{ group.description }}</div>
         <div class="card-body">
 
           {% for post in page %}
@@ -22,7 +22,7 @@
             {% endif %}
           {% endfor %}
 
-          {% include "posts/paginator.html" %}
+          {% include "posts/includes/paginator.html" %}
         </div>
       </div>
     </div>
