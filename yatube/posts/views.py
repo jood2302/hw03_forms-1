@@ -84,7 +84,7 @@ def post_view(request, username, post_id):
     # в контекст страницы требуется передача автора
     author = post.author
     return render(request, 'posts/post.html',
-                  {'post': post, 'author': author})  
+                  {'post': post, 'author': author})
 
 
 @login_required
