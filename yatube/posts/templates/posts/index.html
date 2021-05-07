@@ -9,19 +9,22 @@
 
           {% for post in page %}
             <div>
-              <h3>
-                Автор:
+              <h4>
+                Автор:                 
                 <a href="{% url 'profile' post.author.username %}">
-                  {{ post.author.get_full_name }}</a>, Дата публикации: {{ post.pub_date|date:"d M Y" }}
-                  {% if post.group %}, в подборке <a href="{% url 'group' slug=post.group.slug %}">{{ post.group.title }}</a>{% endif %}
-              </h3>
+                  {{ post.author.get_full_name }}
+                </a>, Дата публикации: {{ post.pub_date|date:"d M Y" }}
+                  {% if post.group %}, в подборке 
+                    <a href="{% url 'group' slug=post.group.slug %}">{{ post.group.title }}</a>
+                  {% endif %}
+              </h4>
             </div>
             <p>{{ post.text|linebreaksbr }}</p>
             {% if not forloop.last %}
               <hr>
             {% endif %}
           {% endfor %}
-          {% include "posts/includes/paginator.html" %}
+          {% include "includes/paginator.html" %}
         </div>
       </div>
     </div>

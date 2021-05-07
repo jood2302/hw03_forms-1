@@ -2,60 +2,58 @@
 {% block title %}Профиль пользователя {{ profile_user.username }}{% endblock %}
 {% block content %}
   {% load user_filters %}
-  <main role="main" class="container">
-    <div class="row">
-      <div class="col-md-3 mb-3 mt-1">
-        <div class="card">
-          <div class="card-body">
-            <div class="h2">
-              {{ profile_user.get_full_name }}
-            </div>
-            <div class="h3 text-muted">
-              @{{ profile_user.username }}
-            </div>
+  <div class="row">
+    <div class="col-md-3 mb-3 mt-1">
+      <div class="card">
+        <div class="card-body">
+          <div class="h2">
+            {{ profile_user.get_full_name }}
           </div>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              <div class="h6 text-muted">
-                Подписчиков: XXX <br />
-                Подписан: XXX
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="h6 text-muted">
-                Записей: {{ profile_user.posts.count }}
-              </div>
-            </li>
-          </ul>
+          <div class="h3 text-muted">
+            @{{ profile_user.username }}
+          </div>
         </div>
-      </div>
-  
-      <div class="col-md-9">
-        {% for post in page %}
-          <div class="card mb-3 mt-1 shadow-sm">
-            <div class="card-body">
-              <p class="card-text">
-                <a href="{% url 'profile' username=profile_user.username %}">
-                  <strong class="d-block text-gray-dark">@{{ profile_user.username }}</strong>
-                </a>
-                {{ post.text }}
-              </p>
-              <div class="d-flex justify-content-between align-items-center">
-                <div class="btn-group ">
-                  
-                  {% if user.username == profile_user.username %}                  
-                    <a class="btn btn-sm text-muted" href="{% url 'post_edit' username=profile_user.username post_id=post.id %}" role="button">
-                      Редактировать
-                    </a>
-                  {% endif %}
-                </div>
-                <small class="text-muted">{{ post.pub_date|date:"d M Y" }}</small>
-              </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <div class="h6 text-muted">
+              Подписчиков: XXX <br />
+              Подписан: XXX
             </div>
-          </div>
-        {% endfor %}
-        {% include "posts/includes/paginator.html" %}
+          </li>
+          <li class="list-group-item">
+            <div class="h6 text-muted">
+              Записей: {{ profile_user.posts.count }}
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
-  </main> 
+
+    <div class="col-md-9">
+      {% for post in page %}
+        <div class="card mb-3 mt-1 shadow-sm">
+          <div class="card-body">
+            <p class="card-text">
+              <a href="{% url 'profile' username=profile_user.username %}">
+                <strong class="d-block text-gray-dark">@{{ profile_user.username }}</strong>
+              </a>
+              {{ post.text|linebreaksbr }}
+            </p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="btn-group ">
+                
+                {% if request.user == profile_user %}                  
+                  <a class="btn btn-sm text-muted" href="{% url 'post_edit' username=profile_user.username post_id=post.id %}" role="button">
+                    Редактировать
+                  </a>
+                {% endif %}
+              </div>
+              <small class="text-muted">{{ post.pub_date|date:"d M Y" }}</small>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      {% include "includes/paginator.html" %}
+    </div>
+  </div>
 {% endblock %}

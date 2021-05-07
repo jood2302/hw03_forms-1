@@ -1,11 +1,14 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import PostForm
 from .models import Group, Post, User
 
-PAGINATOR_COUNT_PER_PAGE: int = 10
+POSTS_PER_PAGE_INDEX: int = 10
+POSTS_PER_PAGE_GROUP: int = 10
+POSTS_PER_PAGE_PROFILE: int = 10
 
 
 def pagination(request, objects, num_per_page):
@@ -26,7 +29,7 @@ def pagination(request, objects, num_per_page):
 
 def index(request):
     post_list = Post.objects.all()
-    page = pagination(request, post_list, PAGINATOR_COUNT_PER_PAGE)
+    page = pagination(request, post_list, POSTS_PER_PAGE_INDEX)
     return render(
         request,
         'posts/index.html',
@@ -37,14 +40,14 @@ def index(request):
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     posts = group.posts.all()
-    page = pagination(request, posts, PAGINATOR_COUNT_PER_PAGE)
+    page = pagination(request, posts, POSTS_PER_PAGE_GROUP)
 
     return render(request, 'posts/group.html', {'group': group, 'page': page})
 
 
 def group_index(request):
     groups = Group.objects.all()
-    page = pagination(request, groups, PAGINATOR_COUNT_PER_PAGE)
+    page = pagination(request, groups, POSTS_PER_PAGE_GROUP)
     return render(request, 'posts/group_index.html',
                   {'groups': groups, 'page': page})
 
@@ -69,7 +72,7 @@ def profile(request, username):
     profile_user = get_object_or_404(User, username=username)
 
     user_posts = profile_user.posts.all()
-    page = pagination(request, user_posts, PAGINATOR_COUNT_PER_PAGE)
+    page = pagination(request, user_posts, POSTS_PER_PAGE_PROFILE)
 
     return render(request, 'posts/profile.html',
                   {'profile_user': profile_user,
@@ -78,25 +81,27 @@ def profile(request, username):
 
 def post_view(request, username, post_id):
     post = get_object_or_404(Post, id=post_id)
-    if post.author.username == username:
-        return render(
-            request, 'posts/post.html',
-            {'post': post, 'post.author': post.author, }
-        )
-    return redirect('post', username=post.author.username, post_id=post_id)
+   
+    # в контекст страницы требуется передача автора  
+    author = post.author
+    return render(request, 'posts/post.html',
+                  {'post': post, 'author': author})  
 
 
 @login_required
 def post_edit(request, username, post_id):
     post = get_object_or_404(Post, id=post_id)
-    if post.author.username == username:
-        form = PostForm(request.POST or None, instance=post)
-        if form.is_valid():
-            post.save()
-            return redirect('post', username=post.author.username,
-                            post_id=post_id)
+    if post.author != request.user:
+        return redirect('post', username=username,
+                        post_id=post_id)
 
-        return render(request, 'posts/new_post.html',
-                      {'form': form, 'post': post, 'edit_flag': True, })
+    form = PostForm(request.POST or None, instance=post)
+    if form.is_valid():
+        post.save()
+        return redirect('post', username=post.author.username,
+                        post_id=post_id)
 
-    return redirect('post', username=post.author.username, post_id=post_id)
+    return render(request, 'posts/new_post.html',
+                    {'form': form, 'post': post, 'edit_flag': True})
+
+    
