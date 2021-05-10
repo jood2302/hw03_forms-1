@@ -3,6 +3,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from posts.models import Group, Post
+from posts.views import index, group_index, new_post, profile, post_edit, post_view, group_posts
 
 User = get_user_model()
 
@@ -180,3 +181,74 @@ class YatubeURL_AbsPath_Tests(TestCase):
         """Проверка, что автор POST /user/post/edit == status 200"""
         resp = self.test_class.authorized_client_a.post('/poster/1/edit/')
         self.assertEqual(resp.status_code, 200)
+
+
+class YatubeURL_Path_Tests_reverse(TestCase):
+    """Проверка доступности url-адресов через reverse()
+
+    URL                                     view                name
+    '/'                                     views.index         'index'
+    '/group/'                               views.group_index   'group_index'
+    '/group/<slug:slug>/'                   views.group_posts   'group'
+    '/new/'                                 views.new_post      'new_post'
+    '<str:username>/'                       views.profile       'profile'
+    '<str:username>/<int:post_id>/'         views.post_view     'name='post'
+    '<str:username>/<int:post_id>/edit/'    views.post_edit     'post_edit'
+    '/signup/'                           views.SignUp.as_view() 'signup'
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # два тестовых юзера, один - автор поста
+        cls.user_with_post = User.objects.create(
+            username='poster_user'
+        )
+        cls.user_no_post = User.objects.create(
+            username='silent_user'
+        )
+        # тестовая группа
+        cls.group_test = Group.objects.create(
+            title='test_group_title',
+            slug='test-slug'
+        )
+
+        # тестовый пост
+        cls.test_post = Post.objects.create(
+            author=cls.user_with_post,
+            text='test_post_text'
+        )
+        cls.test_post.save()
+        cls.group_test.save()
+
+        # неавторизованный клиент
+        cls.guest_client = Client()
+        # авторизованный клиент с постом
+        cls.authorized_client_a = Client()
+        cls.authorized_client_a.force_login(cls.user_with_post)
+        # авторизованный клиент без поста
+        cls.authorized_client = Client()
+        cls.authorized_client.force_login(cls.user_no_post)
+
+        # набор пар "returned reverse url": ("views_name", "name")
+        cls.templts_pgs_names = {
+            '/': (index, 'index'),
+            '/group/': (group_index, 'group_index'),
+            '/group/test-slug/': (group_posts, 'group'),
+            '/new/': (new_post, 'new_post'),
+            '/poster_user/': (profile, 'profile'),
+            '/poster_user/1/': (post_view, 'post'),
+            '/poster_user/1/edit/': (post_edit, 'post_edit'),
+        }
+
+    def test_reverse_url(self):
+        """Проверка, что reverse() отдаёт верные url"""
+        test_array = YatubeURL_Path_Tests_reverse.templts_pgs_names
+        for page_url, view_name in test_array.items():
+            view_func, func_name = view_name
+            print(page_url, view_func, func_name)
+            with self.subTest(page_url=page_url):
+                # resp = self.test_class.guest_client.get(page_url)
+                self.assertEqual(reverse(view_func), page_url)
+                self.assertEqual(reverse(func_name), page_url)
+                print('reverse(view_func)',reverse(view_func), 'page_url',page_url)
+                print('reverse(func_name)',reverse(func_name), 'page_url', page_url)
