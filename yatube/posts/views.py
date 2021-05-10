@@ -102,4 +102,4 @@ def post_edit(request, username, post_id):
                         post_id=post_id)
 
     return render(request, 'posts/new_post.html',
-                  {'form': form, 'post': post, 'edit_flag': True})
+                  {'form': form, 'post': post, 'edit_flag': True})  
