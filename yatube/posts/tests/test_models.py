@@ -8,7 +8,7 @@ from posts.models import Group, Post
 User = get_user_model()
 
 
-class YaTbTstModels(TestCase):
+class YaTbSmokeTst(TestCase):
 
     def setUp(self):
         # Устанавливаем данные для тестирования
@@ -33,29 +33,25 @@ class YaTbTstModels(TestCase):
             author=self.test_user
         )
 
-    def tearDown(self):
-        # Удаляем тестовые данные
-        pass
-
     def test_smoke(self):
-        """'Дымовой тест'. Проверить, что на запрос '/' ответ 200."""
+        """'Дымовой тест. Проверка, что на запрос '/' ответ 200."""
         # Отправляем запрос через client,
         # созданный в setUp()
         response = self.guest_client.get('/')
         self.assertEqual(
             response.status_code, 200,
-            'Неавторизованный пользователь не получает стартовую страницу'
+            'Гость не получает стартовую страницу'
         )
 
     def test_group_str(self):
-        """Проверить, что Group.__str__ возвращает название группы."""
+        """Проверка, что Group.__str__ возвращает название группы."""
         self.assertEqual(
             f'{self.test_group}', 'test_group',
             'Метод Group.__str__ не работает ожидаемым образом'
         )
 
     def test_post_str(self):
-        """Проверить, что Post.__str__ возвращает первые 15 символов поста."""
+        """Проверка, что Post.__str__ возвращает первые 15 символов поста."""
         self.assertEqual(
             f'{self.test_post}', 'test post text ',
             'Метод Post.__str__ не работает ожидаемым образом'
@@ -66,11 +62,10 @@ class YaTube_Test_Models(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        
         # Создаём тестовый набор
         # атрибутов класса
-
-        cls.guest_client = Client()
-
+        #cls.guest_client = Client()
         cls.test_user = User.objects.create(
             username='test_user',
             first_name='first_test_name',
@@ -92,7 +87,7 @@ class YaTube_Test_Models(TestCase):
         )
 
     def test_verbose_name_model_group(self):
-        """verbose_name в полях  Group совпадает с ожидаемым."""
+        """Провека, что verbose_name в полях Group совпадает с ожидаемым."""
         group = YaTube_Test_Models.test_group
         field_verboses = {
             'title': 'Название подборки',
@@ -107,16 +102,16 @@ class YaTube_Test_Models(TestCase):
                 )
 
     def test_help_text_model_group(self):
-        """help_text в полях модели Group совпадает с ожидаемым."""
+        """Проверка, что help_text в полях Group совпадает с ожидаемым."""
         group = YaTube_Test_Models.test_group
         field_help_texts = {
-            'title': 'Группа, сообщество, подборка записей, суть одна, в этом '
-            'месте собраны сообщения, имеющие некую общность. '
+            'title': 'Группа, сообщество, подборка записей, суть одна, '
+            'в этом месте собраны сообщения, имеющие некую общность. '
             'Название подборки призвано её отражать',
             'description': 'Краткое описание принципов объединения записей в'
             ' подборку, тематика и основные правила поведения',
-            'slug': 'Укажите адрес для страницы подборки. Используйте только '
-            'латиницу, цифры, дефисы и знаки подчёркивания',
+            'slug': 'Укажите адрес для страницы подборки. Используйте '
+            'только латиницу, цифры, дефисы и знаки подчёркивания',
         }
         for field, expected_value in field_help_texts.items():
             with self.subTest(field=field):
@@ -124,7 +119,7 @@ class YaTube_Test_Models(TestCase):
                     group._meta.get_field(field).help_text, expected_value)
 
     def test_verbose_name_model_post(self):
-        """verbose_name в полях модели Post совпадает с ожидаемым."""
+        """Проверка, что verbose_name в полях Post совпадает с ожидаемым."""
         post = YaTube_Test_Models.test_post
         field_verboses = {
             'text': 'Текст записи',
