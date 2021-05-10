@@ -10,7 +10,7 @@ POSTS_PER_PAGE_GROUP: int = 10
 POSTS_PER_PAGE_PROFILE: int = 10
 
 
-def pagination(request, objects, num_per_page):
+def pagination(request, objects):
     """Рутина подготовки Пагинатора для страниц.
 
     аргументы:
@@ -20,7 +20,7 @@ def pagination(request, objects, num_per_page):
     num_per_page - сколько объектов выводить на странице
     return - порция объектов для номера страницы из request
     """
-    paginator = Paginator(objects, num_per_page)
+    paginator = Paginator(objects, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     return page
@@ -28,7 +28,7 @@ def pagination(request, objects, num_per_page):
 
 def index(request):
     post_list = Post.objects.all()
-    page = pagination(request, post_list, POSTS_PER_PAGE_INDEX)
+    page = pagination(request, post_list)
     return render(
         request,
         'posts/index.html',
@@ -38,17 +38,17 @@ def index(request):
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = group.posts.all()
-    page = pagination(request, posts, POSTS_PER_PAGE_GROUP)
+    post_list = group.posts.all()
+    page = pagination(request, post_list)
 
     return render(request, 'posts/group.html', {'group': group, 'page': page})
 
 
 def group_index(request):
-    groups = Group.objects.all()
-    page = pagination(request, groups, POSTS_PER_PAGE_GROUP)
+    groups_list = Group.objects.all()
+    page = pagination(request, groups_list)
     return render(request, 'posts/group_index.html',
-                  {'groups': groups, 'page': page})
+                  {'groups': groups_list, 'page': page})
 
 
 @login_required
@@ -71,7 +71,7 @@ def profile(request, username):
     profile_user = get_object_or_404(User, username=username)
 
     user_posts = profile_user.posts.all()
-    page = pagination(request, user_posts, POSTS_PER_PAGE_PROFILE)
+    page = pagination(request, user_posts)
 
     return render(request, 'posts/profile.html',
                   {'profile_user': profile_user,
@@ -79,17 +79,18 @@ def profile(request, username):
 
 
 def post_view(request, username, post_id):
-    post = get_object_or_404(Post, id=post_id)
-
-    # в контекст страницы требуется передача автора
-    author = post.author
+    post = get_object_or_404(
+        Post.objects.filter(author__username=username), id=post_id
+    )
     return render(request, 'posts/post.html',
-                  {'post': post, 'author': author})
+                  {'post': post, 'author': post.author})
 
 
 @login_required
 def post_edit(request, username, post_id):
-    post = get_object_or_404(Post, id=post_id)
+    post = get_object_or_404(
+        Post.objects.filter(author__username=username), id=post_id
+    )
     if post.author != request.user:
         return redirect('post', username=username,
                         post_id=post_id)

@@ -18,6 +18,7 @@
         <h1>{% block header %}{% endblock %}</h1>
         {% block content %}
         {% endblock %}
+        {% include "includes/paginator.html" %}
       </div>
     </main>
     {% include 'includes/footer.html' %}
