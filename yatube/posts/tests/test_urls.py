@@ -8,239 +8,175 @@ User = get_user_model()
 
 
 class YaTbStaticPagesURLTests(TestCase):
-    """Проверить статичные страницы 'об авторе' 'о технолоиях'."""
+    """Проверка статичных страниц 'об авторе' 'о технолоиях'."""
     def setUp(self):
         # Неавторизованый клиент
         self.guest_client = Client()
 
     def test_about_url_exists_at_desired_location(self):
-        """Проверить доступность адреса /about/author/."""
+        """Проверка доступности адреса /about/author/."""
         response = self.guest_client.get('/about/author/')
-        self.assertEqual(response.status_code, 200,
-            'Нужно проверить доступность страницы /about/author'
-            'для неавторизованного пользователя'
+        self.assertEqual(
+            response.status_code, 200,
+            ('Нужно проверить доступность страницы /about/author'
+             'для неавторизованного пользователя')
         )
 
     def test_tech_url_exists_at_desired_location(self):
-        """Проверить доступность адреса /about/tech/."""
+        """Проверка доступности адреса /about/tech/."""
         response = self.guest_client.get('/about/tech/')
-        self.assertEqual(response.status_code, 200,
-            'Нужно проверить доступность страницы /about/tech'
-            ' для неавторизованного пользователя'
+        self.assertEqual(
+            response.status_code, 200,
+            ('Нужно проверить доступность страницы /about/tech'
+             ' для неавторизованного пользователя')
         )
 
     def test_about_url_uses_correct_template(self):
-        """Проверить шаблон для адреса /about/author/.
-        
+        """Проверка шаблона для адреса /about/author/.
+
         Для страницы 'about/author' должен применяться
         шаблон 'about/author.html'"""
         response = self.guest_client.get('/about/author/')
-        self.assertTemplateUsed(response, 'about/author.html', 
-            'Нужно проверить, что для страницы "/about/author"'
-            ' используется шаблон "about/author.html"'
+        self.assertTemplateUsed(
+            response, 'about/author.html',
+            ('Нужно проверить, что для страницы "/about/author"'
+             ' используется шаблон "about/author.html"')
         )
 
     def test_tech_url_uses_correct_template(self):
-        """Проверить шаблон для адреса /about/tech/.
-        
+        """Проверка шаблона для адреса /about/tech/.
+
         Для страницы '/about/tech' должен применяться
         шаблон 'about/tech.html'"""
         response = self.guest_client.get('/about/tech/')
-        self.assertTemplateUsed(response, 'about/tech.html', 
-            'Нужно проверить, что для страницы "/about/tech"'
-            ' используется шаблон "about/tech.html"'
+        self.assertTemplateUsed(
+            response, 'about/tech.html',
+            ('Нужно проверить, что для страницы "/about/tech"'
+             ' используется шаблон "about/tech.html"')
         )
 
-class YatubeURLTests(TestCase):
-    """Проверить работу шаблонов приложения posts по url-адресам"""
+
+class YatubeURL_AbsPath_Tests(TestCase):
+    """Проверка доступности абсолютных url-адресов
+
+    В проекте есть адреса с разной доступностью для guest и user
+    URL                      тип пользователя             редирект
+    "/"                                     g
+    "/group/"                               g
+    "/group/<slug:slug>/"                   g
+    "/<str:username>/"                      g
+    "/<str:username>/<int:post_id>/"        g
+    "/<str:username>/<int:post_id>/edit/"   u-a     g->/login
+                                                    u->/username/post_id/
+    "/new/"                                 u       g->/login
+    """
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        # Создадим запись в БД для проверки доступности
-        # адреса group/group-slug/
-        cls.test_group = Group.objects.create(
-            title='Тестовый заголовок группы',
-            description='Тестовое описание группы',
-            slug='test_slug'
+        # два тестовых юзера, один - автор поста
+        cls.user_with_post = User.objects.create(
+            username='poster_user'
         )
-        cls.test_user = User.objects.create_user(
-            username='user_test'
+        cls.user_no_post = User.objects.create(
+            username='silent_user'
         )
+        # тестовая группа
+        cls.group_test = Group.objects.create(
+            title='test_group_title',
+            slug='test-slug'
+        )
+
+        # тестовый пост
         cls.test_post = Post.objects.create(
-            author=cls.test_user,
-            text='Тестовый текст для теста',
-            group=cls.test_group
+            author=cls.user_with_post,
+            text='test_post_text'
         )
-        
-        # Шаблоны по адресам
-        cls.templates_url_names = {
-            'posts/index.html': '/',
-            'posts/group_index.html': '/group/',
-            'posts/new_post.html': '/new/',
-            'posts/group.html': '/group/test_slug/',
-        }
+        cls.test_post.save()
+        cls.group_test.save()
 
-    def setUp(self):
-        # Создаем неавторизованный клиент
-        self.guest_client = Client()
-        # Создаем пользователя
-        #self.user = User.objects.create_user(username='user_test')
-        # Создаем второй клиент
-        self.authorized_client = Client()
-        # Авторизуем пользователя
-        self.authorized_client.force_login(YatubeURLTests.test_user)
+        # неавторизованный клиент
+        cls.guest_client = Client()
+        # авторизованный клиент с постом
+        cls.authorized_client_a = Client()
+        cls.authorized_client_a.force_login(cls.user_with_post)
+        # авторизованный клиент без поста
+        cls.authorized_client = Client()
+        cls.authorized_client.force_login(cls.user_no_post)
 
-    def test_user_login(self):
-        Login = self.guest_client.login(username='testuser1', password='12345')
-        resp = self.client.get(reverse('index'))
-        self.assertEqual(str(resp.context['user']), 'testuser1')
-        # Проверка ответа на запрос
-        self.assertEqual(resp.status_code, 700)
-
-
-        response = self.guest_client.get('/')
-        self.assertTrue(response.user.is_authenticated)
-        
-        response = self.authorized_client.get('/')
-        self.assertTrue(response.user.is_authenticated)
-    
-    def test_home_url_exists_at_desired_location(self):
-        """Страница '/' доступна любому пользователю."""
-        response = self.guest_client.get('/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_group_slug_url_exists_at_desired_location(self):
-        """Страница 'group/slug' доступна любому пользователю."""
-        response = self.guest_client.get('/group/test_slug/')
-        self.assertEqual(response.status_code, 200)
-
-    # Проверяем доступность страниц для авторизованного пользователя
-    # Страница нового поста /new
-    # method=GET
-    def test_post_added_url_exists_at_desired_location(self):
-        """Страница GET /new/ доступна авторизованному пользователю."""
-        response = self.authorized_client.get('/new/')
-        self.assertEqual(response.status_code, 200)
-
-    # method=POST
-    def test_post_added_url_with_method_post(self):
-            """Страница POST /new/ доступна авторизованному пользователю."""
-            response = self.authorized_client.post('/new/')
-            self.assertEqual(response.status_code, 200)
-
-    # Страница редактирования поста /<str:username>/<int:id>/edit
-    # method=GET
-    def test_post_edit_url_exists_at_desired_location(self):
-        """Страница GET /username/id/edit доступна авторизованному юзеру."""
-        response = self.authorized_client.get(
-            f'/user_test/{YatubeURLTests.test_post.id}/edit'
-        )
-        self.assertEqual(response.status_code, 200)
-
-    # method=POST
-    def test_post_edit_url_with_method_post(self):
-        """Страница POST /username/id/edit доступна авторизованному юзеру."""
-        response = self.authorized_client.post(
-            f'/user_test/{YatubeURLTests.test_post.id}/edit'
-        )
-        self.assertEqual(response.status_code, 302)
-
-    # Проверяем редиректы для неавторизованного пользователя
-    # Страница нового поста /new
-    # method=GET
-    def test_post_added_url_redirect_anonymous_get_method(self):
-        """Страница GET /new/ перенаправляет анонимного пользователя."""
-        response = self.guest_client.get('/new/')
-        self.assertEqual(response.status_code, 301)
-        self.assertRedirects(response, '/auth/login/?next=/new/')
-
-    # method=POST
-    def test_post_added_url_redirect_anonymous_post_method(self):
-        """Страница POST /new/ перенаправляет анонимного пользователя."""
-        response = self.guest_client.post('/new/')
-        self.assertEqual(response.status_code, 301)
-        self.assertRedirects(response, '/auth/login/?next=/new/')
-
-    # Страница редактирования поста /<str:username>/<int:id>/edit
-    # method=GET
-    def test_post_added_url_redirect_anonymous_get_method(self):
-        """Страница GET /username/id/edit перенаправляет анонимного юзера."""
-        url = f'/user_test/{YatubeURLTests.test_post.id}/edit'
-        response = self.guest_client.get(url)
-        self.assertEqual(response.status_code, 301)
-        self.assertRedirects(response, '/auth/login/?next='+url)
-
-    # method=POST
-    def test_post_added_url_redirect_anonymous_post_method(self):
-        """Страница POST /username/id/edit перенаправляет анонимного юзера."""
-        response = self.guest_client.post(
-            f'/user_test/{YatubeURLTests.test_post.id}/edit'
-        )
-        self.assertEqual(response.status_code, 301)
-        self.assertRedirects(response, '/auth/login/?next=/'
-            f'/user_test/{YatubeURLTests.test_post.id}/edit'
-        )
-
-    def test_urls_uses_correct_template(self):
-        """URL-адрес использует соответствующий шаблон."""
-        for template, adress in YatubeURLTests.templates_url_names.items():
-            with self.subTest(adress=adress):
-                response = self.authorized_client.get(adress)
-                self.assertTemplateUsed(response, template)
-
-class YatbTmplTests(TestCase):
-    """Проверить работу шаблонов приложения posts через reverse()"""
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        # Создадим записи в БД:
-        cls.group = Group.objects.create(
-            title='Тестовая подборка записей',
-            description='Тестирующая шаблоны подборка',
-            slug='test-slug',
-        )
-
-        cls.test_post = Post.objects.create(
-            author=User.objects.create(username='Test_user'),
-            text='Проверочный текст для тестового поста',
-            group=cls.group
-        )
-        cls.post_count = Post.objects.all().count()
-
-        # Собираем в словарь пары "имя_html_шаблона: name"
+        # набор пар "url": "status code" для guest
         cls.templts_pgs_names = {
-            'posts/index.html': reverse('index'),
-            'posts/group_index.html': reverse('group_index'),
-            'posts/new_post.html': reverse('new_post'),
-            'posts/group.html': (
-                reverse('group', kwargs={'slug': 'test-slug'})
-            ),
-            'posts/profile.html': (
-                reverse('profile', kwargs={'username': 'Test_user'})
-            ),
-            'posts/post.html': (
-                reverse('post',
-                        kwargs={'username': 'test_user',
-                                'post_id': cls.post_count})
-            ),
+            '/': 200,
+            '/group/': 200,
+            '/group/test-slug/': 200,
+            '/poster_user/': 200,
+            '/poster_user/1/': 200
         }
 
     def setUp(self):
-        # Создаем неавторизованный клиент
-        self.guest_client = Client()
-        # Создаем пользователя
-        self.user = User.objects.create_user(username='CoherentuS')
-        # Создаем авторизованный клиент
-        self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)
+        self.test_class = YatubeURL_AbsPath_Tests
 
-    # Проверяем используемые шаблоны
-    def test_pages_use_correct_template(self):
-        """URL-адрес использует соответствующий шаблон."""
-        # Проверяем, что при обращении к name вызывается
-        # соответствующий HTML-шаблон
-        for template, reverse_name in YatbTmplTests.templts_pgs_names.items():
+    def test_guest_get_nonautorized_pages(self):
+        """Проверка, что guest видит доступные страницы"""
+        for page_url, resp_code in self.test_class.templts_pgs_names.items():
 
-            with self.subTest(reverse_name=reverse_name):
-                response = self.authorized_client.get(reverse_name)
-                self.assertTemplateUsed(response, template)
+            with self.subTest(page_url=page_url):
+                resp = self.test_class.guest_client.get(page_url)
+                self.assertEqual(resp.status_code, resp_code, page_url)
+
+    # проверка редиректов по абсолютным путям
+    # guest "new/" -> "login/"
+    # method == GET
+    def test_guest_abs_new_redirect_login_get(self):
+        """Проверка, что guest GET /new -> /auth/login/?next=/new/"""
+        resp = self.test_class.guest_client.get('/new/')
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, '/auth/login/?next=/new/')
+
+    # method == POST
+    def test_guest_abs_new_redirect_login_post(self):
+        """Проверка, что guest POST /new -> /auth/login/?next=/new/"""
+        resp = self.test_class.guest_client.post('/new/')
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, '/auth/login/?next=/new/')
+
+    # guest GET "<username>/post_id/edit" -> "login/"
+    def test_guest_abs_edit_redirect_login_get(self):
+        """Проверка, что guest GET /user/post/edit -> /auth/login/?next=..."""
+        resp = self.test_class.guest_client.get('/poster/1/edit/')
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, '/auth/login/?next=/poster/1/edit/')
+
+    # guest POST "<username>/post_id/edit" -> "login/"
+    def test_guest_abs_edit_redirect_login_post(self):
+        """Проверка, что guest POST /user/post/edit -> /auth/login/?next=..."""
+        resp = self.test_class.guest_client.post('/poster/1/edit/')
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, '/auth/login/?next=/poster/1/edit/')
+
+    # user-not-author "<username>/post_id/edit" -> "<username>/post_id/"
+    # method == GET
+    def test_user_abs_edit_redirect_postcard_get(self):
+        """Проверка, что не автор GET /user/post/edit -> /user/post/"""
+        resp = self.test_class.authorized_client.get('/poster/1/edit/')
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, '/poster/1/')
+
+    # method == POST
+    def test_user_abs_edit_redirect_postcard_post(self):
+        """Проверка, что не автор POST /user/post/edit -> /user/post/"""
+        resp = self.test_class.authorized_client.post('/poster/1/edit/')
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, '/poster/1/')
+
+    # user-author "<username>/post_id/edit" 200
+    # method == GET
+    def test_user_author_abs_edit_redirect_postcard_get(self):
+        """Проверка, что автор GET /user/post/edit == status 200"""
+        resp = self.test_class.authorized_client_a.get('/poster/1/edit/')
+        self.assertEqual(resp.status_code, 200)
+
+    # method == POST
+    def test_user_author_abs_edit_redirect_postcard_post(self):
+        """Проверка, что автор POST /user/post/edit == status 200"""
+        resp = self.test_class.authorized_client_a.post('/poster/1/edit/')
+        self.assertEqual(resp.status_code, 200)
