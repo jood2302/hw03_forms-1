@@ -62,10 +62,9 @@ class YaTube_Test_Models(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        
+
         # Создаём тестовый набор
         # атрибутов класса
-        #cls.guest_client = Client()
         cls.test_user = User.objects.create(
             username='test_user',
             first_name='first_test_name',
