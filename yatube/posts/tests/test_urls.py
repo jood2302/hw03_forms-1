@@ -3,7 +3,8 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from posts.models import Group, Post
-from posts.views import index, group_index, new_post, profile, post_edit, post_view, group_posts
+from posts.views import (index, group_index, new_post, profile, post_edit,
+                         post_view, group_posts)
 
 User = get_user_model()
 
@@ -230,25 +231,44 @@ class YatubeURL_Path_Tests_reverse(TestCase):
         cls.authorized_client.force_login(cls.user_no_post)
 
         # набор пар "returned reverse url": ("views_name", "name")
-        cls.templts_pgs_names = {
+        cls.templts_pgs_names_simple = {
             '/': (index, 'index'),
             '/group/': (group_index, 'group_index'),
-            '/group/test-slug/': (group_posts, 'group'),
             '/new/': (new_post, 'new_post'),
-            '/poster_user/': (profile, 'profile'),
-            '/poster_user/1/': (post_view, 'post'),
-            '/poster_user/1/edit/': (post_edit, 'post_edit'),
         }
 
-    def test_reverse_url(self):
+        # набор пар "returned reverse url": ("views_name", "name", kwargs)
+        cls.templts_pgs_names_args = {
+            '/group/test-slug/': (group_posts, 'group',
+                                  {'slug': cls.group_test.slug}),
+            '/poster_user/': (profile, 'profile',
+                              {'username': cls.user_with_post.username}),
+            '/poster_user/1/': (post_view, 'post',
+                                {'username': cls.user_with_post.username,
+                                 'post_id': cls.test_post.id}),
+            '/poster_user/1/edit/': (post_edit, 'post_edit',
+                                     {'username': cls.user_with_post.username,
+                                      'post_id': cls.test_post.id}),
+        }
+
+    def test_reverse_url_simple(self):
         """Проверка, что reverse() отдаёт верные url"""
-        test_array = YatubeURL_Path_Tests_reverse.templts_pgs_names
-        for page_url, view_name in test_array.items():
-            view_func, func_name = view_name
-            print(page_url, view_func, func_name)
+        test_array = YatubeURL_Path_Tests_reverse.templts_pgs_names_simple
+        for page_url, dict_args in test_array.items():
+            view_func, func_name = dict_args
             with self.subTest(page_url=page_url):
                 # resp = self.test_class.guest_client.get(page_url)
                 self.assertEqual(reverse(view_func), page_url)
                 self.assertEqual(reverse(func_name), page_url)
-                print('reverse(view_func)',reverse(view_func), 'page_url',page_url)
-                print('reverse(func_name)',reverse(func_name), 'page_url', page_url)
+
+    def test_reverse_url_args(self):
+        """Проверка, что reverse() with args отдаёт верные url"""
+        test_array = YatubeURL_Path_Tests_reverse.templts_pgs_names_args
+        for page_url, dict_args in test_array.items():
+            view_func, func_name, args_array = dict_args
+            with self.subTest(page_url=page_url):
+                # resp = self.test_class.guest_client.get(page_url)
+                self.assertEqual(reverse(view_func,
+                                         kwargs=args_array), page_url)
+                self.assertEqual(reverse(func_name,
+                                         kwargs=args_array), page_url)
