@@ -252,7 +252,7 @@ class YatubeURL_Path_Tests_reverse(TestCase):
         }
 
     def test_reverse_url_simple(self):
-        """Проверка, что reverse() отдаёт верные url"""
+        """Проверка, что reverse() отдаёт верные предопределённые url"""
         test_array = YatubeURL_Path_Tests_reverse.templts_pgs_names_simple
         for page_url, dict_args in test_array.items():
             view_func, func_name = dict_args
@@ -262,7 +262,7 @@ class YatubeURL_Path_Tests_reverse(TestCase):
                 self.assertEqual(reverse(func_name), page_url)
 
     def test_reverse_url_args(self):
-        """Проверка, что reverse() with args отдаёт верные url"""
+        """Проверка, что reverse() with args отдаёт верные url генерируемые"""
         test_array = YatubeURL_Path_Tests_reverse.templts_pgs_names_args
         for page_url, dict_args in test_array.items():
             view_func, func_name, args_array = dict_args
@@ -272,3 +272,83 @@ class YatubeURL_Path_Tests_reverse(TestCase):
                                          kwargs=args_array), page_url)
                 self.assertEqual(reverse(func_name,
                                          kwargs=args_array), page_url)
+
+
+class YatubeURL_Path_isTemplates_right_Tests(TestCase):
+    """Проверка парвильности шаблонов по url-адресам
+
+    URL                                     temlate
+    '/'                                     posts/index.html
+    '/group/'                               posts/group_index.html
+    '/group/<slug:slug>/'                   posts/group.html
+    '/new/'                                 posts/new_post.html
+    '<str:username>/'                       posts/profile.html
+    '<str:username>/<int:post_id>/'         posts/post.html
+    '<str:username>/<int:post_id>/edit/'    posts/new_post.html
+    '/about/author/'                        about/author.html
+    '/about/tech/'                          about/tech.html
+    '/signup/'                              users/signup.html
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # два тестовых юзера, один - автор поста
+        cls.user_with_post = User.objects.create(
+            username='poster_user'
+        )
+        cls.user_no_post = User.objects.create(
+            username='silent_user'
+        )
+        # тестовая группа
+        cls.group_test = Group.objects.create(
+            title='test_group_title',
+            slug='test-slug'
+        )
+
+        # тестовый пост
+        cls.test_post = Post.objects.create(
+            author=cls.user_with_post,
+            text='test_post_text'
+        )
+        cls.test_post.save()
+        cls.group_test.save()
+
+        # неавторизованный клиент
+        cls.guest_client = Client()
+        # авторизованный клиент с постом
+        cls.authorized_client_a = Client()
+        cls.authorized_client_a.force_login(cls.user_with_post)
+        # авторизованный клиент без поста
+        cls.authorized_client = Client()
+        cls.authorized_client.force_login(cls.user_no_post)
+
+        # набор пар "returned reverse url": ("views_name", "name")
+        cls.templts_pgs_names_simple = {
+            '/': (index, 'index'),
+            '/group/': (group_index, 'group_index'),
+            '/new/': (new_post, 'new_post'),
+        }
+
+        # набор пар "url": "имя шаблона"
+        cls.templts_url_temlate_name = {
+            '/': 'posts/index.html',
+            '/group/': 'posts/group_index.html',
+            '/group/test-slug/': 'posts/group.html',
+            '/new/': 'posts/new_post.html',
+            '/poster_user/': 'posts/profile.html',
+            '/poster_user/1/': 'posts/post.html',
+            '/poster_user/1/edit/': 'posts/new_post.html',
+            '/about/author/': 'about/author.html',
+            '/about/tech/': 'about/tech.html',
+            '/signup/': 'users/signup.html',
+        }
+
+    def test_right_temlate_use_with_url(self):
+        """Проверка, что по запросу url используется верный шаблон"""
+        test_class = YatubeURL_Path_isTemplates_right_Tests
+        test_array = test_class.templts_url_temlate_name
+        for page_url, temlat_name in test_array.items():
+
+            with self.subTest(page_url=page_url):
+                resp = test_class.authorized_client_a.get(page_url)
+                self.assertTemplateUsed(resp, temlat_name)
