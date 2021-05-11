@@ -12,15 +12,16 @@
   </head>
 
   <body>
-    {% include 'nav.html' %}
-    <main>
+    {% include 'includes/nav.html' %}
+    <main role="main" class="container">
       <div class="container">
         <h1>{% block header %}{% endblock %}</h1>
         {% block content %}
         {% endblock %}
+        {% include "includes/paginator.html" %}
       </div>
     </main>
-    {% include 'footer.html' %}
+    {% include 'includes/footer.html' %}
   </body>
 
 </html>
