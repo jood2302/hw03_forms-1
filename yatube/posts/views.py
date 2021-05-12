@@ -1,8 +1,7 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
-
-from yatube.settings import PAGINATOR_DEFAULT_SIZE
 
 from .forms import PostForm
 from .models import Group, Post, User
@@ -14,10 +13,10 @@ def pagination(request, objects):
     аргументы:
     request - HttpRequest от запрошенной страницы, содержит номер страницы,
               для которой нужно вывести порцию объектов
-    objects - перечень объектов, которые надо разбить постранично
+    objects - набор объектов, которые надо разбить постранично
     return - порция объектов для номера страницы из request
     """
-    paginator = Paginator(objects, PAGINATOR_DEFAULT_SIZE)
+    paginator = Paginator(objects, settings.PAGINATOR_DEFAULT_SIZE)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     return page
