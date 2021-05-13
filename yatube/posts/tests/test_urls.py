@@ -77,10 +77,10 @@ class YatubeURL_AbsPath_Tests(TestCase):
         super().setUpClass()
         # два тестовых юзера, один - автор поста
         cls.user_with_post = User.objects.create(
-            username='poster_user'
+            username='poster'
         )
         cls.user_no_post = User.objects.create(
-            username='silent_user'
+            username='silent'
         )
         # тестовая группа
         cls.group_test = Group.objects.create(
@@ -110,8 +110,8 @@ class YatubeURL_AbsPath_Tests(TestCase):
             '/': 200,
             '/group/': 200,
             '/group/test-slug/': 200,
-            '/poster_user/': 200,
-            '/poster_user/1/': 200
+            '/poster/': 200,
+            '/poster/1/': 200
         }
 
     def setUp(self):
@@ -340,7 +340,7 @@ class YatubeURL_Path_isTemplates_right_Tests(TestCase):
             '/poster_user/1/edit/': 'posts/new_post.html',
             '/about/author/': 'about/author.html',
             '/about/tech/': 'about/tech.html',
-            '/signup/': 'users/signup.html',
+            '/auth/signup/': 'users/signup.html',
         }
 
     def test_right_temlate_use_with_url(self):
