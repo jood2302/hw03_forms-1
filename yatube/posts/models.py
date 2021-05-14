@@ -27,6 +27,7 @@ class Group(models.Model):
     class Meta:
         verbose_name = 'Подборка записей'
         verbose_name_plural = 'Подборки записей'
+        ordering = ('pk',)
 
     def __str__(self):
         return self.title
