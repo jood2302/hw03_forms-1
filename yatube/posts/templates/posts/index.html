@@ -19,9 +19,9 @@
                 Дата публикации: {{ post.pub_date|date:"d M Y" }}
                 {% if post.group %}
                   <span> - подборка</span>
-                    <a href="{% url 'group' slug=post.group.slug %}">
-                      {{ post.group.title }}
-                    </a>
+                  <a href="{% url 'group' slug=post.group.slug %}">
+                    {{ post.group.title }}
+                  </a>
                 {% endif %}
               </h4>
             </div>
