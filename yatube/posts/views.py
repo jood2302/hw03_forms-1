@@ -1,13 +1,10 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import PostForm
 from .models import Group, Post, User
-
-POSTS_PER_PAGE_INDEX: int = 10
-POSTS_PER_PAGE_GROUP: int = 10
-POSTS_PER_PAGE_PROFILE: int = 10
 
 
 def pagination(request, objects):
@@ -16,11 +13,10 @@ def pagination(request, objects):
     аргументы:
     request - HttpRequest от запрошенной страницы, содержит номер страницы,
               для которой нужно вывести порцию объектов
-    objects - перечень объектов, которые надо разбить постранично
-    num_per_page - сколько объектов выводить на странице
+    objects - набор объектов, которые надо разбить постранично
     return - порция объектов для номера страницы из request
     """
-    paginator = Paginator(objects, 10)
+    paginator = Paginator(objects, settings.PAGINATOR_DEFAULT_SIZE)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     return page
@@ -79,18 +75,14 @@ def profile(request, username):
 
 
 def post_view(request, username, post_id):
-    post = get_object_or_404(
-        Post.objects.filter(author__username=username), id=post_id
-    )
+    post = get_object_or_404(Post, author__username=username, id=post_id)
     return render(request, 'posts/post.html',
                   {'post': post, 'author': post.author})
 
 
 @login_required
 def post_edit(request, username, post_id):
-    post = get_object_or_404(
-        Post.objects.filter(author__username=username), id=post_id
-    )
+    post = get_object_or_404(Post, author__username=username, id=post_id)
     if post.author != request.user:
         return redirect('post', username=username,
                         post_id=post_id)
@@ -102,4 +94,4 @@ def post_edit(request, username, post_id):
                         post_id=post_id)
 
     return render(request, 'posts/new_post.html',
-                  {'form': form, 'post': post, 'edit_flag': True})
+                  {'form': form, 'edit_flag': True})

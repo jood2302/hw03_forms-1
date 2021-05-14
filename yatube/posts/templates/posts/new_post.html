@@ -14,13 +14,7 @@
   
           {% include "includes/form_error_handling.html" %}  
           
-          <form  method="post" action=" 
-            {% if edit_flag %} 
-              {% url 'post_edit' username=post.author.username post_id=post.id %} 
-            {% else %} 
-              {% url 'new_post' %}
-            {% endif %} 
-            ">
+          <form  method="post">
 
             {% csrf_token %}
 
