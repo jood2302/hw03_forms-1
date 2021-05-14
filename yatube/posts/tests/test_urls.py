@@ -275,7 +275,7 @@ class YatubeURL_Path_Tests_reverse(TestCase):
 
 
 class YatubeURL_Path_isTemplates_right_Tests(TestCase):
-    """Проверка парвильности шаблонов по url-адресам
+    """Проверка правильности шаблонов по url-адресам
 
     URL                                     temlate
     '/'                                     posts/index.html
