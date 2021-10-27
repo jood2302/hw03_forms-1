@@ -4,7 +4,7 @@
 
 ## студент  Ковылин Василий
 
-## Учебный проект sprint_3.  Новые записи.
+## Учебный проект sprint_4.  Новые записи.
 
 ***
 
@@ -30,7 +30,6 @@
 
 ```
 git clone https://github.com/coherentus/hw03_forms
-
 cd hw03_forms
 ```
 
@@ -56,7 +55,6 @@ source venv/Scripts/activate
 
 ```
 python3 -m pip install --upgrade pip
-
 pip install -r requirements.txt
 ```
 
