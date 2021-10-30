@@ -36,7 +36,7 @@ cd hw03_forms
 Cоздать и активировать виртуальное окружение:
 
 ```
-python3 -m venv venv
+python -m venv venv
 ```
 
 Для *nix-систем и MacOS:
@@ -54,7 +54,7 @@ source venv/Scripts/activate
 Установить зависимости из файла requirements.txt:
 
 ```
-python3 -m pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
@@ -62,13 +62,13 @@ pip install -r requirements.txt
 
 ```
 cd yatube
-python3 manage.py migrate
+python manage.py migrate
 ```
 
 Запустить проект:
 
 ```
-python3 manage.py runserver
+python manage.py runserver
 ```
 
 Создать суперпользователя Django:
